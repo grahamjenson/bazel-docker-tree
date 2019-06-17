@@ -1,32 +1,21 @@
 def _docker_build(ctx):
-  name = ctx.attr.name
-  folder = ctx.file.dockerfile.dirname
-
-  froms = [f.image_sha for f in ctx.attr.froms]
+  froms = [f.image_digest for f in ctx.attr.froms]
 
   ctx.actions.run(
     executable = ctx.executable._docker_tool,
     inputs = ctx.files.dockerfile + froms,
     arguments = [
-      ctx.outputs.imagesha.path,
-      "build",
-      "-q",
-      "-t", name + ":bazel",
-      "-f", ctx.file.dockerfile.path,
-      folder
+      ctx.attr.name,
+      ctx.file.dockerfile.path,
+      ctx.outputs.image_digest.path,
+      ctx.attr.test_command,
+      ctx.attr.test_value,
     ],
-    outputs = [ctx.outputs.imagesha],
+    outputs = [ctx.outputs.image_digest],
   )
 
-
-  froms_file = ctx.actions.declare_file("froms")
-
-  print(froms)
-  ctx.actions.write(froms_file, str(froms))
-
   return struct(
-    image_name = name,
-    image_sha = ctx.outputs.imagesha,
+    image_digest = ctx.outputs.image_digest,
   )
 
 docker_build = rule(
@@ -37,6 +26,8 @@ docker_build = rule(
       mandatory = True,
     ),
     "froms": attr.label_list(),
+    "test_command": attr.string(),
+    "test_value": attr.string(),
     "_docker_tool": attr.label(
       executable = True,
       cfg = "host",
@@ -45,6 +36,6 @@ docker_build = rule(
     ),
   },
   outputs = {
-    "imagesha": "sha"
+    "image_digest": "image_digest"
   },
 )

@@ -1,0 +1,1 @@
+FROM ubuntu:19.10@sha256:95cfb84d2654fd604240ced28c0b57c5aff7614de8ccdb71755cf908d43be02a

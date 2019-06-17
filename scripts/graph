@@ -1,0 +1,11 @@
+#!/bin/bash
+
+set -e
+bazel query --noimplicit_deps 'deps(//src/...)' --output graph > graph.in
+awk 'NR==3{print "node [ style=\"rounded,filled,bold\", shape=box,  fontname=\"Arial\" fontcolor=\"#183153\", color=\"#183153\", fillcolor=\"#FBFBFB\"];"}7' graph.in > graph.tmp
+awk 'NR==3{print "edge [ style=bold, fontname=\"Arial\", fontcolor=\"#183153\", color=\"#183153\" ]"}7' graph.tmp > graph.in
+
+dot -Tpng -o graph.png graph.in && open graph.png
+# style
+
+
